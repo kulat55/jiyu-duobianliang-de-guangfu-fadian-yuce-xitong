@@ -3,9 +3,9 @@
 基于 **Flask + Scikit-learn + TensorFlow (LSTM)** 的多变量光伏发电预测 Web 系统。系统读取光照、散射辐射、直射辐射、温度等多变量历史数据，提供**线性回归预测**与**LSTM 短时（0-15 分钟）趋势预测**，并内置监控大屏、数据管理、模型训练、结果评估、AI 智能问答等完整功能。
 
 > 本系统在 GitHub 上有两个内容完全一致的仓库，任选其一克隆即可：
-> - [pv-power-forecast-system](https://github.com/kulat55/pv-power-forecast-system)（主仓库）
-> - [pv-forecast-system](https://github.com/kulat55/pv-forecast-system)（短名仓库）
-> 注：GitHub 不支持中文仓库名，中文字符会被自动替换为连字符，故未使用中文仓库名。
+> - [pv-power-forecast-system](https://github.com/kulat55/pv-power-forecast-system)（英文仓库名）
+> - [jiyu-duobianliang-de-guangfu-fadian-yuce-xitong](https://github.com/kulat55/jiyu-duobianliang-de-guangfu-fadian-yuce-xitong)（拼音仓库名，对应「基于多变量的光伏发电预测系统」）
+> 注：GitHub 不支持中文仓库名，中文字符会被自动替换为连字符，故使用拼音与英文仓库名。
 
 ## 功能特性
 
