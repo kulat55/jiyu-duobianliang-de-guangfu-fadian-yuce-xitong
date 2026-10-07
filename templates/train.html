@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>模型训练</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="dashboard-body">
+
+<div class="top-bar">
+
+    <div>
+        <h1>模型训练中心</h1>
+        <p>Machine Learning Model Training</p>
+    </div>
+
+    <div class="top-status">
+        {% if trained %}
+            <span>模型训练完成</span>
+        {% else %}
+            <span>等待训练</span>
+        {% endif %}
+        <a href="/">返回首页</a>
+    </div>
+
+</div>
+
+<div class="screen-container">
+
+    <div class="hero-card">
+
+        <h2>光伏发电预测模型训练</h2>
+
+        <p>
+            本页面用于启动模型训练流程。
+            系统会读取当前上传的完整光伏数据集，
+            自动按照 6 : 2 : 2 的比例划分训练集、验证集和测试集，
+            并依次完成线性回归模型和 LSTM 时序模型训练。
+        </p>
+
+    </div>
+
+    <div class="panel">
+
+        <div class="panel-title">
+            <h3>训练操作</h3>
+            <span>Training Operation</span>
+        </div>
+
+        <div style="
+            line-height: 2;
+            color: #dff7ff;
+            font-size: 15px;
+            margin-bottom: 20px;
+        ">
+            点击下方按钮后，系统会自动执行：
+            数据读取、数据清洗、训练集划分、验证集划分、测试集划分、
+            线性回归模型训练、LSTM 模型训练、模型保存和评估结果保存。
+            训练过程可能需要等待一段时间，请不要重复点击按钮。
+        </div>
+
+        <form method="post">
+
+            <button class="login-btn" type="submit">
+                开始训练模型
+            </button>
+
+        </form>
+
+        {% if error_message %}
+        <div style="
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 14px;
+            background: rgba(255, 77, 109, 0.15);
+            border: 1px solid rgba(255, 77, 109, 0.45);
+            color: #ffd6df;
+            line-height: 1.8;
+        ">
+            <strong>训练失败：</strong>
+            {{ error_message }}
+            <br>
+            请进入“系统运行日志”页面查看详细错误信息。
+        </div>
+        {% endif %}
+
+    </div>
+
+    <div class="metric-grid" style="margin-top: 24px;">
+
+        <div class="metric-card">
+            <span>训练状态</span>
+
+            {% if trained %}
+                <strong>完成</strong>
+                <em>SUCCESS</em>
+            {% else %}
+                <strong>未开始</strong>
+                <em>WAITING</em>
+            {% endif %}
+
+            <div style="
+                margin-top: 16px;
+                color: #7ffcff;
+                font-size: 15px;
+                font-weight: bold;
+            ">
+                用途：显示模型训练进度
+            </div>
+
+            <p style="
+                margin-top: 10px;
+                color: #dff7ff;
+                line-height: 1.8;
+                font-size: 14px;
+            ">
+                用于判断当前模型是否已经完成训练，训练完成后可以继续进行预测和评估。
+            </p>
+        </div>
+
+        <div class="metric-card">
+            <span>训练集</span>
+            <strong>{{ train_count }}</strong>
+            <em>Train</em>
+
+            <div style="
+                margin-top: 16px;
+                color: #7ffcff;
+                font-size: 15px;
+                font-weight: bold;
+            ">
+                用途：模型学习和参数训练
+            </div>
+
+            <p style="
+                margin-top: 10px;
+                color: #dff7ff;
+                line-height: 1.8;
+                font-size: 14px;
+            ">
+                用于让模型学习光伏数据中的变化规律，使模型能够拟合历史发电数据。
+            </p>
+        </div>
+
+        <div class="metric-card">
+            <span>验证集</span>
+            <strong>{{ val_count }}</strong>
+            <em>Validation</em>
+
+            <div style="
+                margin-top: 16px;
+                color: #7ffcff;
+                font-size: 15px;
+                font-weight: bold;
+            ">
+                用途：模型调优和参数选择
+            </div>
+
+            <p style="
+                margin-top: 10px;
+                color: #dff7ff;
+                line-height: 1.8;
+                font-size: 14px;
+            ">
+                用于观察模型在未参与训练数据上的表现，帮助选择较合适的训练参数。
+            </p>
+        </div>
+
+        <div class="metric-card">
+            <span>测试集</span>
+            <strong>{{ test_count }}</strong>
+            <em>Test</em>
+
+            <div style="
+                margin-top: 16px;
+                color: #7ffcff;
+                font-size: 15px;
+                font-weight: bold;
+            ">
+                用途：模型最终性能评估
+            </div>
+
+            <p style="
+                margin-top: 10px;
+                color: #dff7ff;
+                line-height: 1.8;
+                font-size: 14px;
+            ">
+                用于在训练完成后检验模型预测能力，判断模型是否具有较好的泛化效果。
+            </p>
+        </div>
+
+    </div>
+
+   <div class="panel" style="margin-top: 24px;">
+
+    <div class="panel-title">
+        <h3>模型评价结果</h3>
+        <span>Model Evaluation Result</span>
+    </div>
+
+    <table border="1" width="100%" cellpadding="12">
+
+        <tr>
+            <th>MAE</th>
+            <th>MSE</th>
+            <th>R²</th>
+        </tr>
+
+        <tr>
+            <td>{{ test_mae }}</td>
+            <td>{{ test_mse }}</td>
+            <td>{{ test_r2 }}</td>
+        </tr>
+
+    </table>
+
+</div>
+
+
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>训练流程说明</h3>
+            <span>Training Process</span>
+        </div>
+
+        <div style="
+            line-height: 2;
+            color: #dff7ff;
+            font-size: 15px;
+        ">
+
+            当前训练流程包括：
+
+            <br><br>
+
+            • 读取光伏数据集
+
+            <br>
+
+            • 统一字段格式
+
+            <br>
+
+            • 缺失值与重复值处理
+
+            <br>
+
+            • 按时间顺序划分训练集、验证集和测试集
+
+            <br>
+
+            • 训练线性回归模型
+
+            <br>
+
+            • 训练 LSTM 时序预测模型
+
+            <br>
+
+            • 保存模型文件、归一化器、损失曲线和评估结果
+
+            <br><br>
+
+            {% if trained %}
+                当前模型训练已完成，可继续进入“结果评估”“LSTM预测”“训练损失曲线”等页面查看结果。
+            {% else %}
+                当前模型尚未训练，请点击“开始训练模型”按钮启动训练流程。
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>训练模型信息</h3>
+            <span>Model Information</span>
+        </div>
+
+        <table border="1" width="100%" cellpadding="12">
+
+            <tr>
+                <th>模型类型</th>
+                <th>功能说明</th>
+            </tr>
+
+            <tr>
+                <td>线性回归模型</td>
+                <td>
+                    使用传统机器学习算法，
+                    根据光照、散射辐照度、直射辐照度和温度等环境变量预测发电功率。
+                </td>
+            </tr>
+
+            <tr>
+                <td>LSTM 时序预测模型</td>
+                <td>
+                    使用历史多变量时间序列数据进行训练，
+                    学习光伏发电功率随时间变化的规律，用于短期发电趋势预测。
+                </td>
+            </tr>
+
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

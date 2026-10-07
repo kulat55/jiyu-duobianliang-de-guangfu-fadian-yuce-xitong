@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>用户注册 - 光伏发电预测系统</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="dashboard-body">
+
+<div class="login-page">
+
+    <!-- 左侧介绍 -->
+    <div class="login-left">
+
+        <h1>光伏发电智能预测平台</h1>
+
+        <p>
+            基于多变量时序预测模型，
+            集成数据管理、机器学习预测、
+            LSTM深度学习、AI智能分析与系统运行监控功能，
+            用于辅助光伏电站运行分析与发电趋势预测。
+        </p>
+
+    </div>
+
+    <!-- 注册卡片 -->
+    <div class="login-card">
+
+        <h2>用户注册</h2>
+
+        <p class="login-subtitle">
+            创建系统账号以使用光伏预测平台
+        </p>
+
+        <form method="post">
+
+            <div class="form-group">
+
+                <label>用户名</label>
+
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="请输入用户名"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>密码</label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="请输入密码"
+                    required
+                >
+
+            </div>
+
+            <button class="login-btn" type="submit">
+                注册账号
+            </button>
+
+        </form>
+
+        <div class="login-link">
+
+            已有账号？
+
+            <a href="/login">
+                去登录
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

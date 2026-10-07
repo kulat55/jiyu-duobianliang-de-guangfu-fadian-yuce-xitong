@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>LSTM预测</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+</head>
+
+<body class="dashboard-body">
+
+<div class="top-bar">
+    <div>
+        <h1>LSTM时序预测</h1>
+        <p>LSTM 15/30 Minutes Forecasting</p>
+    </div>
+
+    <div class="top-status">
+        {% if model_exists and scaler_exists and not error_message %}
+            <span>预测模型运行中</span>
+        {% else %}
+            <span>模型未就绪</span>
+        {% endif %}
+        <a href="/">返回首页</a>
+    </div>
+</div>
+
+<div class="screen-container">
+
+    <div class="hero-card">
+        <h2>0-15分钟发电功率预测对比</h2>
+        <p>
+            系统使用最近的多变量时序数据作为输入，
+            通过LSTM模型预测后续15分钟和30分钟的发电功率，
+            并在同一张图中展示预测值与实际值的对比结果。
+        </p>
+    </div>
+
+    {% if error_message %}
+    <div class="panel" style="margin-bottom: 24px;">
+
+        <div class="panel-title">
+            <h3>LSTM预测状态提醒</h3>
+            <span>LSTM Prediction Status</span>
+        </div>
+
+        <div style="
+            padding: 18px;
+            border-radius: 16px;
+            background: rgba(255, 181, 71, 0.15);
+            border: 1px solid rgba(255, 181, 71, 0.45);
+            color: #ffe8b8;
+            line-height: 2;
+            font-size: 15px;
+        ">
+            {{ error_message }}
+        </div>
+
+    </div>
+    {% endif %}
+
+    <div class="metric-grid">
+
+        <div class="metric-card">
+            <span>LSTM模型文件</span>
+            {% if model_exists %}
+                <strong>正常</strong>
+            {% else %}
+                <strong>缺失</strong>
+            {% endif %}
+            <em>Model</em>
+        </div>
+
+        <div class="metric-card">
+            <span>归一化器文件</span>
+            {% if scaler_exists %}
+                <strong>正常</strong>
+            {% else %}
+                <strong>缺失</strong>
+            {% endif %}
+            <em>Scaler</em>
+        </div>
+
+        <div class="metric-card">
+            <span>预测平均功率</span>
+            <strong>{{ avg_future_power }}</strong>
+            <em>kW</em>
+        </div>
+
+        <div class="metric-card">
+            <span>预测最高功率</span>
+            <strong>{{ max_future_power }}</strong>
+            <em>kW</em>
+        </div>
+
+        <div class="metric-card">
+            <span>预测最低功率</span>
+            <strong>{{ min_future_power }}</strong>
+            <em>kW</em>
+        </div>
+
+    </div>
+
+    <div class="panel" style="margin-top: 24px;">
+        <div class="panel-title">
+            <h3>预测趋势分析</h3>
+            <span>Trend Analysis</span>
+        </div>
+
+        <div style="line-height: 2; color: #dff7ff;">
+            {{ trend_text }}
+        </div>
+    </div>
+
+    <div class="main-grid" style="margin-top: 24px;">
+
+        <div class="panel chart-panel">
+            <div class="panel-title">
+                <h3>预测值与实际值对比图</h3>
+                <span>Prediction vs Actual</span>
+            </div>
+
+            {% if future_predictions|length > 0 %}
+                <div id="futureChart" style="width: 100%; height: 460px;"></div>
+            {% else %}
+                <div style="
+                    height: 460px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #bdeeff;
+                    font-size: 16px;
+                ">
+                    暂无预测曲线，请先完成模型训练。
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="panel status-panel">
+            <div class="panel-title">
+                <h3>预测结果明细</h3>
+                <span>Forecast Details</span>
+            </div>
+
+            <table border="1" width="100%" cellpadding="12">
+                <tr>
+                    <th>预测时间</th>
+                    <th>预测功率</th>
+                    <th>实际功率</th>
+                    <th>绝对误差</th>
+                </tr>
+
+                {% if future_predictions|length > 0 %}
+
+                    {% for power in future_predictions %}
+                    <tr>
+                        <td>{{ future_times[loop.index0] }}</td>
+                        <td>{{ power }} kW</td>
+                        <td>{{ actual_values[loop.index0] }} kW</td>
+                        <td>{{ (power - actual_values[loop.index0]) | abs | round(2) }} kW</td>
+                    </tr>
+                    {% endfor %}
+
+                {% else %}
+
+                    <tr>
+                        <td colspan="4">暂无预测结果</td>
+                    </tr>
+
+                {% endif %}
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+{% if future_predictions|length > 0 %}
+<script>
+    var futureTimes = {{ future_times | tojson }};
+    var futurePowers = {{ future_predictions | tojson }};
+    var actualPowers = {{ actual_values | tojson }};
+
+    var chart = echarts.init(document.getElementById("futureChart"));
+
+    var option = {
+        backgroundColor: 'transparent',
+        tooltip: {
+            trigger: "axis"
+        },
+        legend: {
+            data: ["预测功率", "实际功率"],
+            textStyle: {
+                color: "#b8eaff"
+            }
+        },
+        grid: {
+            left: '5%',
+            right: '5%',
+            bottom: '10%',
+            top: '16%',
+            containLabel: true
+        },
+        xAxis: {
+            type: "category",
+            name: "预测时间",
+            data: futureTimes,
+            axisLine: {
+                lineStyle: {
+                    color: '#6ee7ff'
+                }
+            },
+            axisLabel: {
+                color: '#b8eaff'
+            }
+        },
+        yAxis: {
+            type: "value",
+            name: "发电功率(kW)",
+            nameTextStyle: {
+                color: '#b8eaff'
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#6ee7ff'
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: 'rgba(110,231,255,0.15)'
+                }
+            },
+            axisLabel: {
+                color: '#b8eaff'
+            }
+        },
+        series: [
+            {
+                name: "预测功率",
+                type: "line",
+                smooth: true,
+                symbolSize: 8,
+                lineStyle: {
+                    width: 3
+                },
+                data: futurePowers
+            },
+            {
+                name: "实际功率",
+                type: "line",
+                smooth: true,
+                symbolSize: 8,
+                lineStyle: {
+                    width: 3
+                },
+                data: actualPowers
+            }
+        ]
+    };
+
+    chart.setOption(option);
+
+    window.addEventListener("resize", function () {
+        chart.resize();
+    });
+</script>
+{% endif %}
+
+</body>
+
+</html>

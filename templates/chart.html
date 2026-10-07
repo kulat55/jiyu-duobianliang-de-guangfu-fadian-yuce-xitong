@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>数据可视化</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+</head>
+
+<body class="dashboard-body">
+
+<div class="top-bar">
+
+    <div>
+        <h1>数据可视化分析</h1>
+        <p>Photovoltaic Data Visualization</p>
+    </div>
+
+    <div class="top-status">
+        <span>实时监控中</span>
+        <a href="/">返回首页</a>
+    </div>
+
+</div>
+
+<div class="screen-container">
+
+    <!-- 页面介绍 -->
+    <div class="hero-card">
+
+        <h2>光伏发电趋势可视化系统</h2>
+
+        <p>
+            系统通过图形化方式展示光伏发电功率变化趋势，
+            用于辅助分析电站运行状态及发电效率变化情况。
+        </p>
+
+    </div>
+
+    <!-- 图表区域 -->
+    <div class="panel">
+
+        <div class="panel-title">
+            <h3>发电功率趋势图</h3>
+            <span>Power Trend Chart</span>
+        </div>
+
+        <div id="powerChart" style="width: 100%; height: 550px;"></div>
+
+    </div>
+
+</div>
+
+<script>
+
+    // 时间数据
+    var times = {{ times | tojson }};
+
+    // 功率数据
+    var powers = {{ powers | tojson }};
+
+    // 初始化图表
+    var chart = echarts.init(
+        document.getElementById('powerChart')
+    );
+
+    // 图表配置
+    var option = {
+
+        backgroundColor: 'transparent',
+
+        tooltip: {
+            trigger: 'axis'
+        },
+
+        grid: {
+            left: '5%',
+            right: '5%',
+            bottom: '10%',
+            top: '12%',
+            containLabel: true
+        },
+
+        xAxis: {
+
+            type: 'category',
+
+            data: times,
+
+            axisLine: {
+                lineStyle: {
+                    color: '#6ee7ff'
+                }
+            },
+
+            axisLabel: {
+                color: '#b8eaff'
+            }
+        },
+
+        yAxis: {
+
+            type: 'value',
+
+            name: '发电功率(kW)',
+
+            nameTextStyle: {
+                color: '#b8eaff'
+            },
+
+            axisLine: {
+                lineStyle: {
+                    color: '#6ee7ff'
+                }
+            },
+
+            splitLine: {
+                lineStyle: {
+                    color: 'rgba(110,231,255,0.15)'
+                }
+            },
+
+            axisLabel: {
+                color: '#b8eaff'
+            }
+        },
+
+        series: [{
+
+            name: '发电功率',
+
+            type: 'line',
+
+            smooth: true,
+
+            symbolSize: 6,
+
+            areaStyle: {
+                opacity: 0.25
+            },
+
+            lineStyle: {
+                width: 3
+            },
+
+            data: powers
+        }]
+    };
+
+    // 加载图表
+    chart.setOption(option);
+
+    // 响应式
+    window.addEventListener("resize", function () {
+        chart.resize();
+    });
+
+</script>
+
+</body>
+
+</html>

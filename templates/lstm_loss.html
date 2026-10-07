@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>LSTM训练损失曲线</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+</head>
+
+<body class="dashboard-body">
+
+<div class="top-bar">
+
+    <div>
+        <h1>LSTM模型训练监控</h1>
+        <p>LSTM Training Loss Visualization</p>
+    </div>
+
+    <div class="top-status">
+        <span>模型训练完成</span>
+        <a href="/">返回首页</a>
+    </div>
+
+</div>
+
+<div class="screen-container">
+
+    <!-- 页面介绍 -->
+    <div class="hero-card">
+
+        <h2>LSTM训练损失曲线分析</h2>
+
+        <p>
+            系统通过可视化方式展示LSTM模型在训练过程中的训练集Loss和验证集Val_Loss变化趋势，
+            用于观察模型收敛情况、验证效果以及是否存在过拟合现象。
+        </p>
+
+    </div>
+
+    <!-- 指标卡片 -->
+    <div class="metric-grid">
+
+        <div class="metric-card">
+            <span>训练轮数</span>
+            <strong>{{ epochs|length }}</strong>
+            <em>Epoch</em>
+        </div>
+
+        <div class="metric-card">
+            <span>最终训练Loss</span>
+            <strong>{{ losses[-1] }}</strong>
+            <em>Loss</em>
+        </div>
+
+        <div class="metric-card">
+            <span>最终验证Val_Loss</span>
+            <strong>{{ val_losses[-1] }}</strong>
+            <em>Val</em>
+        </div>
+
+        <div class="metric-card">
+            <span>最低训练Loss</span>
+            <strong>{{ losses|min }}</strong>
+            <em>Loss</em>
+        </div>
+
+        <div class="metric-card">
+            <span>最低验证Val_Loss</span>
+            <strong>{{ val_losses|min }}</strong>
+            <em>Val</em>
+        </div>
+
+    </div>
+
+    <!-- 图表区域 -->
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>LSTM训练损失与验证损失曲线</h3>
+            <span>Training Loss & Validation Loss</span>
+        </div>
+
+        <div id="lossChart" style="width: 100%; height: 550px;"></div>
+
+    </div>
+
+    <!-- 说明区域 -->
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>训练结果说明</h3>
+            <span>Training Analysis</span>
+        </div>
+
+        <div style="
+            line-height: 2;
+            color: #dff7ff;
+            font-size: 15px;
+        ">
+
+            Loss表示模型在训练集上的误差，Val_Loss表示模型在验证集上的误差。
+
+            <br><br>
+
+            在训练过程中：
+
+            <br>
+
+            • 如果Loss和Val_Loss都逐渐下降，说明模型训练效果较好；
+
+            <br>
+
+            • 如果Loss下降但Val_Loss上升，说明模型可能出现过拟合；
+
+            <br>
+
+            • 如果两条曲线都震荡较大，说明训练过程可能不稳定；
+
+            <br>
+
+            • 如果两条曲线趋于平稳，说明模型基本完成收敛。
+
+            <br><br>
+
+            当前页面可用于判断LSTM模型训练过程是否正常。
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    var epochs = {{ epochs | tojson }};
+    var losses = {{ losses | tojson }};
+    var valLosses = {{ val_losses | tojson }};
+
+    var chart = echarts.init(
+        document.getElementById('lossChart')
+    );
+
+    var option = {
+
+        backgroundColor: 'transparent',
+
+        tooltip: {
+            trigger: 'axis'
+        },
+
+        legend: {
+            data: ['训练Loss', '验证Val_Loss'],
+            textStyle: {
+                color: '#b8eaff'
+            },
+            top: 10
+        },
+
+        grid: {
+            left: '5%',
+            right: '5%',
+            bottom: '10%',
+            top: '18%',
+            containLabel: true
+        },
+
+        xAxis: {
+
+            type: 'category',
+
+            name: '训练轮数(Epoch)',
+
+            data: epochs,
+
+            axisLine: {
+                lineStyle: {
+                    color: '#6ee7ff'
+                }
+            },
+
+            axisLabel: {
+                color: '#b8eaff'
+            }
+        },
+
+        yAxis: {
+
+            type: 'value',
+
+            name: 'Loss',
+
+            nameTextStyle: {
+                color: '#b8eaff'
+            },
+
+            axisLine: {
+                lineStyle: {
+                    color: '#6ee7ff'
+                }
+            },
+
+            splitLine: {
+                lineStyle: {
+                    color: 'rgba(110,231,255,0.15)'
+                }
+            },
+
+            axisLabel: {
+                color: '#b8eaff'
+            }
+        },
+
+        series: [
+            {
+                name: '训练Loss',
+                type: 'line',
+                smooth: true,
+                symbolSize: 6,
+                lineStyle: {
+                    width: 3
+                },
+                data: losses
+            },
+            {
+                name: '验证Val_Loss',
+                type: 'line',
+                smooth: true,
+                symbolSize: 6,
+                lineStyle: {
+                    width: 3
+                },
+                data: valLosses
+            }
+        ]
+    };
+
+    chart.setOption(option);
+
+    window.addEventListener("resize", function () {
+        chart.resize();
+    });
+
+</script>
+
+</body>
+
+</html>

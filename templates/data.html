@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>数据管理</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="dashboard-body">
+
+<div class="top-bar">
+
+    <div>
+        <h1>数据管理</h1>
+        <p>Photovoltaic Data Management</p>
+    </div>
+
+    <div class="top-status">
+        <span>数据模块运行中</span>
+        <a href="/">返回首页</a>
+    </div>
+
+</div>
+
+<div class="screen-container">
+
+    <div class="hero-card">
+
+        <h2>光伏数据导入与管理</h2>
+
+        <p>
+            本页面上传的是完整的光伏原始数据集，不需要手动区分训练集、验证集和测试集。
+            系统会在模型训练阶段自动按照时间顺序将数据划分为训练集、验证集和测试集，
+            默认比例为 6 : 2 : 2。
+        </p>
+
+    </div>
+
+    <div class="panel">
+
+        <div class="panel-title">
+            <h3>上传数据集</h3>
+            <span>CSV Upload</span>
+        </div>
+
+        <div style="
+            margin-bottom: 18px;
+            line-height: 2;
+            color: #dff7ff;
+            background: rgba(2, 15, 31, 0.45);
+            border: 1px solid rgba(111, 224, 255, 0.18);
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 15px;
+        ">
+            <strong>上传说明：</strong>
+            请上传一个完整的 CSV 数据文件。
+            上传后系统会统一保存为 <strong>data/pv_data.csv</strong>。
+            后续点击“模型训练”时，系统会自动完成数据读取、字段标准化、
+            训练集划分、验证集划分、测试集划分和模型训练。
+            用户不需要分别上传训练集、验证集、测试集。
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+
+            <div class="form-group">
+                <label>选择光伏数据CSV文件</label>
+                <input type="file" name="file" accept=".csv" required>
+            </div>
+
+            <button class="login-btn" type="submit">
+                上传并导入数据
+            </button>
+
+        </form>
+
+    </div>
+
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>数据预览</h3>
+            <span>Standardized Data Preview</span>
+        </div>
+
+        <div style="
+            margin-bottom: 16px;
+            color: #bdeeff;
+            line-height: 1.8;
+            font-size: 14px;
+        ">
+            下方展示的是系统标准化后的数据字段。
+            无论原始数据来自 PVOD 格式还是宁夏光伏数据格式，
+            系统都会尽量转换为统一字段：
+            time、light、diffuse、direct、temperature、power。
+        </div>
+
+        <div style="overflow-x:auto;">
+
+            <table border="1" width="100%" cellpadding="10">
+                <tr>
+                    <th>时间</th>
+                    <th>总辐照度</th>
+                    <th>散射辐照度</th>
+                    <th>直射辐照度</th>
+                    <th>温度</th>
+                    <th>发电功率</th>
+                </tr>
+
+                {% for row in pv_data %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[2] }}</td>
+                    <td>{{ row[3] }}</td>
+                    <td>{{ row[4] }}</td>
+                    <td>{{ row[5] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

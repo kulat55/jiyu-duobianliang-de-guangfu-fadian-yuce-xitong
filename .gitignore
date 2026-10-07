@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# IDE
+.idea/
+
+# 运行时数据（首次启动自动重建）
+logs/
+database.db
+identifier.sqlite
+paste/
+
+# 模型训练产生的评估/损失文件（训练时会自动生成）
+data/model_evaluate.csv
+data/lstm_evaluate.csv
+data/lstm_loss.csv

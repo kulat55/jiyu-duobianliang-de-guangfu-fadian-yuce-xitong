@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>系统运行日志</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="dashboard-body">
+
+<div class="top-bar">
+
+    <div>
+        <h1>系统运行日志</h1>
+        <p>System Runtime Log Monitoring</p>
+    </div>
+
+    <div class="top-status">
+        <span>日志系统运行中</span>
+        <a href="/">返回首页</a>
+    </div>
+
+</div>
+
+<div class="screen-container">
+
+    <div class="hero-card">
+
+        <h2>系统日志监控中心</h2>
+
+        <p>
+            系统自动记录数据导入、模型训练、预测分析、AI服务调用和异常错误信息。
+            本页面支持选择不同日志文件进行查看，便于定位系统运行过程中的问题。
+        </p>
+
+    </div>
+
+    <div class="metric-grid">
+
+        <div class="metric-card">
+            <span>当前日志文件</span>
+            <strong style="font-size:18px;">
+                {{ current_log if current_log else "暂无日志" }}
+            </strong>
+            <em>LOG</em>
+        </div>
+
+        <div class="metric-card">
+            <span>日志文件数量</span>
+            <strong>{{ log_files|length }}</strong>
+            <em>Files</em>
+        </div>
+
+        <div class="metric-card">
+            <span>日志状态</span>
+            {% if current_log %}
+                <strong>正常</strong>
+            {% else %}
+                <strong>暂无</strong>
+            {% endif %}
+            <em>Status</em>
+        </div>
+
+    </div>
+
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>日志文件选择</h3>
+            <span>Log File Selection</span>
+        </div>
+
+        {% if log_files|length > 0 %}
+
+        <form method="get">
+
+            <div class="form-group">
+                <label>选择要查看的日志文件</label>
+
+                <select name="file" style="
+                    width: 100%;
+                    padding: 14px;
+                    border-radius: 12px;
+                    border: 1px solid rgba(111, 224, 255, 0.35);
+                    background: rgba(2, 15, 31, 0.75);
+                    color: #dff7ff;
+                    font-size: 15px;
+                    outline: none;
+                ">
+
+                    {% for file in log_files %}
+                    <option value="{{ file }}" {% if file == current_log %}selected{% endif %}>
+                        {{ file }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+            </div>
+
+            <button class="login-btn" type="submit">
+                查看该日志
+            </button>
+
+        </form>
+
+        {% else %}
+
+        <div style="
+            padding: 18px;
+            border-radius: 16px;
+            background: rgba(255, 181, 71, 0.15);
+            border: 1px solid rgba(255, 181, 71, 0.45);
+            color: #ffe8b8;
+            line-height: 2;
+            font-size: 15px;
+        ">
+            当前 logs 文件夹中还没有日志文件。
+            请重新启动系统或执行模型训练、预测等操作后再查看。
+        </div>
+
+        {% endif %}
+
+    </div>
+
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>运行日志内容</h3>
+            <span>Runtime Logs</span>
+        </div>
+
+        <div style="
+            background: #020b16;
+            border: 1px solid rgba(0,255,170,0.15);
+            color: #5dffb7;
+            padding: 24px;
+            border-radius: 18px;
+            height: 650px;
+            overflow-y: auto;
+            font-family: Consolas, monospace;
+            white-space: pre-wrap;
+            line-height: 1.7;
+            box-shadow: inset 0 0 35px rgba(0,255,170,0.05);
+        ">{% if log_content %}{{ log_content }}{% else %}暂无日志内容{% endif %}</div>
+
+    </div>
+
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>日志系统说明</h3>
+            <span>Log System Description</span>
+        </div>
+
+        <div style="
+            line-height: 2;
+            color: #dff7ff;
+            font-size: 15px;
+        ">
+
+            日志内容主要用于记录系统运行过程中的关键操作。
+
+            <br><br>
+
+            包括：
+
+            <br>
+
+            • 数据集上传与读取记录
+
+            <br>
+
+            • 模型训练状态与训练脚本输出
+
+            <br>
+
+            • 发电预测结果
+
+            <br>
+
+            • LSTM预测结果
+
+            <br>
+
+            • AI分析服务调用情况
+
+            <br>
+
+            • 系统异常与错误信息
+
+            <br><br>
+
+            当页面出现错误时，可以优先查看最新日志文件中的错误信息。
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

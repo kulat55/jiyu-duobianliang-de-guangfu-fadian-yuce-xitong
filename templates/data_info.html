@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>数据集信息</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="dashboard-body">
+
+<div class="top-bar">
+    <div>
+        <h1>数据集信息</h1>
+        <p>Dataset Information & Quality Inspection</p>
+    </div>
+
+    <div class="top-status">
+        <span>数据检测完成</span>
+        <a href="/">返回首页</a>
+    </div>
+</div>
+
+<div class="screen-container">
+
+    <div class="hero-card">
+        <h2>光伏数据集概览</h2>
+        <p>
+            系统对当前上传的光伏数据集进行字段标准化、缺失值检查、重复值检查、
+            数据清洗统计和训练集划分统计，用于判断数据是否满足模型训练和预测分析需求。
+        </p>
+    </div>
+
+    <!-- 核心指标 -->
+    <div class="metric-grid">
+
+        <div class="metric-card">
+            <span>原始数据行数</span>
+            <strong>{{ raw_row_count }}</strong>
+            <em>Raw</em>
+        </div>
+
+        <div class="metric-card">
+            <span>清洗后行数</span>
+            <strong>{{ clean_row_count }}</strong>
+            <em>Clean</em>
+        </div>
+
+        <div class="metric-card">
+            <span>字段数量</span>
+            <strong>{{ col_count }}</strong>
+            <em>Columns</em>
+        </div>
+
+        <div class="metric-card">
+            <span>数据健康度</span>
+            <strong>{{ quality_score }}</strong>
+            <em>分</em>
+        </div>
+
+        <div class="metric-card">
+            <span>质量状态</span>
+            <strong>{{ quality_status }}</strong>
+            <em>Status</em>
+        </div>
+
+    </div>
+
+    <!-- 数据基本信息 -->
+    <div class="main-grid" style="margin-top: 24px;">
+
+        <div class="panel">
+
+            <div class="panel-title">
+                <h3>基本统计信息</h3>
+                <span>Basic Statistics</span>
+            </div>
+
+            <table border="1" width="100%" cellpadding="12">
+                <tr>
+                    <th>数据项</th>
+                    <th>数值</th>
+                </tr>
+
+                <tr>
+                    <td>原始数据总行数</td>
+                    <td>{{ raw_row_count }}</td>
+                </tr>
+
+                <tr>
+                    <td>清洗后数据总行数</td>
+                    <td>{{ clean_row_count }}</td>
+                </tr>
+
+                <tr>
+                    <td>清洗删除行数</td>
+                    <td>{{ removed_count }}</td>
+                </tr>
+
+                <tr>
+                    <td>字段数量</td>
+                    <td>{{ col_count }}</td>
+                </tr>
+
+                <tr>
+                    <td>开始时间</td>
+                    <td>{{ start_time }}</td>
+                </tr>
+
+                <tr>
+                    <td>结束时间</td>
+                    <td>{{ end_time }}</td>
+                </tr>
+
+                <tr>
+                    <td>平均发电功率</td>
+                    <td>{{ avg_power }} kW</td>
+                </tr>
+
+                <tr>
+                    <td>最大发电功率</td>
+                    <td>{{ max_power }} kW</td>
+                </tr>
+
+                <tr>
+                    <td>最小发电功率</td>
+                    <td>{{ min_power }} kW</td>
+                </tr>
+
+                <tr>
+                    <td>平均温度</td>
+                    <td>{{ avg_temp }} ℃</td>
+                </tr>
+
+                <tr>
+                    <td>平均光照强度</td>
+                    <td>{{ avg_light }} W/m²</td>
+                </tr>
+            </table>
+
+        </div>
+
+        <!-- 数据质量检查 -->
+        <div class="panel">
+
+            <div class="panel-title">
+                <h3>数据质量检查</h3>
+                <span>Data Quality</span>
+            </div>
+
+            <div class="status-list">
+
+                <div class="status-item">
+                    <span>原始缺失值数量</span>
+                    <strong>{{ raw_missing_count }}</strong>
+                </div>
+
+                <div class="status-item">
+                    <span>原始重复行数量</span>
+                    <strong>{{ raw_duplicate_count }}</strong>
+                </div>
+
+                <div class="status-item">
+                    <span>清洗后缺失值数量</span>
+                    <strong>{{ clean_missing_count }}</strong>
+                </div>
+
+                <div class="status-item">
+                    <span>清洗后重复行数量</span>
+                    <strong>{{ clean_duplicate_count }}</strong>
+                </div>
+
+                <div class="status-item">
+                    <span>质量状态</span>
+                    <strong>{{ quality_status }}</strong>
+                </div>
+
+                <div class="status-item">
+                    <span>健康度评分</span>
+                    <strong>{{ quality_score }} 分</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- 数据集划分 -->
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>训练集、验证集、测试集划分</h3>
+            <span>Dataset Split</span>
+        </div>
+
+        <table border="1" width="100%" cellpadding="12">
+
+            <tr>
+                <th>数据集</th>
+                <th>划分比例</th>
+                <th>样本数量</th>
+                <th>用途说明</th>
+            </tr>
+
+            <tr>
+                <td>训练集</td>
+                <td>60%</td>
+                <td>{{ train_count }}</td>
+                <td>用于模型学习数据规律和参数训练</td>
+            </tr>
+
+            <tr>
+                <td>验证集</td>
+                <td>20%</td>
+                <td>{{ val_count }}</td>
+                <td>用于观察训练效果和辅助调参</td>
+            </tr>
+
+            <tr>
+                <td>测试集</td>
+                <td>20%</td>
+                <td>{{ test_count }}</td>
+                <td>用于最终评估模型在未见数据上的预测能力</td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    <!-- 字段说明 -->
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>系统标准字段说明</h3>
+            <span>Field Description</span>
+        </div>
+
+        <table border="1" width="100%" cellpadding="12">
+            <tr>
+                <th>字段名</th>
+                <th>字段含义</th>
+            </tr>
+
+            <tr>
+                <td>time</td>
+                <td>数据采集时间</td>
+            </tr>
+
+            <tr>
+                <td>light</td>
+                <td>总辐照度，用于表示太阳辐射强度</td>
+            </tr>
+
+            <tr>
+                <td>diffuse</td>
+                <td>散射辐照度</td>
+            </tr>
+
+            <tr>
+                <td>direct</td>
+                <td>直射辐照度，如果原始数据没有该字段，则系统自动补0</td>
+            </tr>
+
+            <tr>
+                <td>temperature</td>
+                <td>环境温度</td>
+            </tr>
+
+            <tr>
+                <td>power</td>
+                <td>光伏发电功率，作为模型预测目标</td>
+            </tr>
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

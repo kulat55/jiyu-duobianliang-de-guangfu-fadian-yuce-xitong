@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>AI数据分析</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="dashboard-body">
+
+<div class="top-bar">
+
+    <div>
+        <h1>AI智能数据分析</h1>
+        <p>Photovoltaic AI Data Analysis</p>
+    </div>
+
+    <div class="top-status">
+        <span>AI分析引擎运行中</span>
+        <a href="/">返回首页</a>
+    </div>
+
+</div>
+
+<div class="screen-container">
+
+    <!-- 顶部介绍 -->
+    <div class="hero-card">
+
+        <h2>光伏发电智能分析系统</h2>
+
+        <p>
+            系统基于本地AI模型与光伏运行数据，
+            自动生成发电趋势分析、运行状态评估、
+            环境因素影响分析及优化建议。
+        </p>
+
+    </div>
+
+    <!-- 数据概览 -->
+    <div class="panel">
+
+        <div class="panel-title">
+            <h3>核心运行指标</h3>
+            <span>Core Metrics</span>
+        </div>
+
+        <div class="metric-grid">
+
+            <div class="metric-card">
+                <span>平均发电功率</span>
+                <strong>{{ avg_power }}</strong>
+                <em>kW</em>
+            </div>
+
+            <div class="metric-card">
+                <span>最大发电功率</span>
+                <strong>{{ max_power }}</strong>
+                <em>kW</em>
+            </div>
+
+            <div class="metric-card">
+                <span>最小发电功率</span>
+                <strong>{{ min_power }}</strong>
+                <em>kW</em>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- 数据统计 -->
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>数据统计信息</h3>
+            <span>Data Statistics</span>
+        </div>
+
+        <table border="1" width="100%" cellpadding="12">
+
+            <tr>
+                <th>指标</th>
+                <th>数值</th>
+            </tr>
+
+            <tr>
+                <td>平均发电功率</td>
+                <td>{{ avg_power }} kW</td>
+            </tr>
+
+            <tr>
+                <td>最大发电功率</td>
+                <td>{{ max_power }} kW</td>
+            </tr>
+
+            <tr>
+                <td>最小发电功率</td>
+                <td>{{ min_power }} kW</td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    <!-- AI分析结果 -->
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>AI分析报告</h3>
+            <span>AI Analysis Report</span>
+        </div>
+
+        <div style="
+            background: rgba(2, 15, 31, 0.55);
+            border: 1px solid rgba(111, 224, 255, 0.18);
+            padding: 24px;
+            border-radius: 18px;
+            line-height: 2.1;
+            color: #dff7ff;
+            white-space: pre-wrap;
+            font-size: 15px;
+        ">
+
+            {{ report | safe }}
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

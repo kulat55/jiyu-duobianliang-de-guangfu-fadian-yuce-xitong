@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>模型信息</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="dashboard-body">
+
+<div class="top-bar">
+    <div>
+        <h1>模型信息管理</h1>
+        <p>Model File Status & Integrity Inspection</p>
+    </div>
+
+    <div class="top-status">
+        <span>模型状态已检测</span>
+        <a href="/">返回首页</a>
+    </div>
+</div>
+
+<div class="screen-container">
+
+    <div class="hero-card">
+        <h2>预测模型与训练结果文件完整性检查</h2>
+        <p>
+            系统会检测当前模型训练后生成的关键文件，
+            包括线性回归模型、LSTM模型、归一化器、损失曲线文件和评估结果文件。
+            如果文件缺失，请先进入“模型训练”页面重新训练模型。
+        </p>
+    </div>
+
+    <div class="metric-grid">
+
+        <div class="metric-card">
+            <span>文件完整性</span>
+            <strong>{{ overall_status }}</strong>
+            <em>Status</em>
+        </div>
+
+        <div class="metric-card">
+            <span>正常文件数</span>
+            <strong>{{ normal_count }}</strong>
+            <em>Normal</em>
+        </div>
+
+        <div class="metric-card">
+            <span>缺失文件数</span>
+            <strong>{{ missing_count }}</strong>
+            <em>Missing</em>
+        </div>
+
+        <div class="metric-card">
+            <span>检查文件总数</span>
+            <strong>{{ model_files|length }}</strong>
+            <em>Total</em>
+        </div>
+
+    </div>
+
+    <div class="panel" style="margin-top: 24px;">
+        <div class="panel-title">
+            <h3>模型与结果文件详情</h3>
+            <span>Model File Details</span>
+        </div>
+
+        <table border="1" width="100%" cellpadding="12">
+            <tr>
+                <th>文件名称</th>
+                <th>文件路径</th>
+                <th>用途说明</th>
+                <th>状态</th>
+                <th>文件大小</th>
+            </tr>
+
+            {% for item in model_files %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.path }}</td>
+                <td>{{ item.desc }}</td>
+                <td>{{ item.status }}</td>
+                <td>{{ item.size }} KB</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="panel" style="margin-top: 24px;">
+        <div class="panel-title">
+            <h3>文件作用说明</h3>
+            <span>File Description</span>
+        </div>
+
+        <table border="1" width="100%" cellpadding="12">
+
+            <tr>
+                <th>文件类型</th>
+                <th>作用说明</th>
+            </tr>
+
+            <tr>
+                <td>线性回归模型文件</td>
+                <td>
+                    保存传统机器学习模型，用于根据光照、散射辐照度、直射辐照度和温度预测发电功率。
+                </td>
+            </tr>
+
+            <tr>
+                <td>线性回归评估文件</td>
+                <td>
+                    保存线性回归模型在验证集和测试集上的MAE、MSE、R²等评估指标。
+                </td>
+            </tr>
+
+            <tr>
+                <td>LSTM模型文件</td>
+                <td>
+                    保存深度学习时序预测模型，用于根据历史多变量数据预测未来发电功率趋势。
+                </td>
+            </tr>
+
+            <tr>
+                <td>LSTM归一化器文件</td>
+                <td>
+                    保存训练阶段使用的归一化器，保证预测阶段输入数据范围与训练阶段保持一致。
+                </td>
+            </tr>
+
+            <tr>
+                <td>LSTM训练损失文件</td>
+                <td>
+                    保存LSTM训练过程中的训练损失和验证损失，用于绘制Loss曲线。
+                </td>
+            </tr>
+
+            <tr>
+                <td>LSTM评估文件</td>
+                <td>
+                    保存LSTM模型在测试集上的评估结果，用于结果评估页面展示。
+                </td>
+            </tr>
+
+        </table>
+    </div>
+
+</div>
+
+</body>
+
+</html>

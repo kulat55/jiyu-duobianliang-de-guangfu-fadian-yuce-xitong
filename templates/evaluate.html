@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>结果评估</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body class="dashboard-body">
+
+<div class="top-bar">
+
+    <div>
+        <h1>模型结果评估</h1>
+        <p>Prediction Evaluation Metrics</p>
+    </div>
+
+    <div class="top-status">
+        <span>模型评估完成</span>
+        <a href="/">返回首页</a>
+    </div>
+
+</div>
+
+<div class="screen-container">
+
+    <!-- 顶部介绍 -->
+    <div class="hero-card">
+
+        <h2>光伏发电预测模型评估</h2>
+
+        <p>
+            系统采用测试集数据对光伏发电预测模型进行最终精度评估。
+            测试集不参与模型训练和参数调整，仅用于检验模型在未见数据上的预测能力。
+        </p>
+
+    </div>
+
+    <!-- 测试集信息 -->
+    <div class="metric-grid">
+
+        <div class="metric-card">
+            <span>测试集样本数</span>
+            <strong>{{ test_count }}</strong>
+            <em>Test</em>
+        </div>
+
+        <div class="metric-card">
+            <span>评估模型数量</span>
+            <strong>2</strong>
+            <em>Models</em>
+        </div>
+
+        <div class="metric-card">
+            <span>评估指标</span>
+            <strong>MAE / MSE / R²</strong>
+            <em>Metrics</em>
+        </div>
+
+    </div>
+
+    <!-- 线性回归评估 -->
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>线性回归模型评估结果</h3>
+            <span>Linear Regression Evaluation</span>
+        </div>
+
+        <div class="metric-grid">
+
+            <div class="metric-card">
+                <span>MAE</span>
+                <strong>{{ lr_mae }}</strong>
+                <em>误差</em>
+            </div>
+
+            <div class="metric-card">
+                <span>MSE</span>
+                <strong>{{ lr_mse }}</strong>
+                <em>误差</em>
+            </div>
+
+            <div class="metric-card">
+                <span>R²</span>
+                <strong>{{ lr_r2 }}</strong>
+                <em>拟合度</em>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- LSTM评估 -->
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>LSTM时序模型评估结果</h3>
+            <span>LSTM Evaluation</span>
+        </div>
+
+        <div class="metric-grid">
+
+            <div class="metric-card">
+                <span>MAE</span>
+                <strong>{{ lstm_mae }}</strong>
+                <em>误差</em>
+            </div>
+
+            <div class="metric-card">
+                <span>MSE</span>
+                <strong>{{ lstm_mse }}</strong>
+                <em>误差</em>
+            </div>
+
+            <div class="metric-card">
+                <span>R²</span>
+                <strong>{{ lstm_r2 }}</strong>
+                <em>拟合度</em>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- 评估结果对比表 -->
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>模型评估对比</h3>
+            <span>Model Comparison</span>
+        </div>
+
+        <table border="1" width="100%" cellpadding="12">
+
+            <tr>
+                <th>模型类型</th>
+                <th>MAE</th>
+                <th>MSE</th>
+                <th>R²</th>
+                <th>说明</th>
+            </tr>
+
+            <tr>
+                <td>线性回归模型</td>
+                <td>{{ lr_mae }}</td>
+                <td>{{ lr_mse }}</td>
+                <td>{{ lr_r2 }}</td>
+                <td>
+                    根据光照、散射辐照度、直射辐照度和温度等环境变量进行基础预测。
+                </td>
+            </tr>
+
+            <tr>
+                <td>LSTM时序模型</td>
+                <td>{{ lstm_mae }}</td>
+                <td>{{ lstm_mse }}</td>
+                <td>{{ lstm_r2 }}</td>
+                <td>
+                    根据历史多变量时序数据学习时间变化规律，用于未来发电功率趋势预测。
+                </td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    <!-- 指标说明 -->
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>评估指标说明</h3>
+            <span>Evaluation Description</span>
+        </div>
+
+        <div style="
+            line-height: 2;
+            color: #dff7ff;
+            font-size: 15px;
+        ">
+
+            MAE表示平均绝对误差，用于衡量预测值与真实值之间的平均偏差，数值越小表示预测效果越好。
+
+            <br><br>
+
+            MSE表示均方误差，会放大较大的预测误差，数值越小表示模型预测越稳定。
+
+            <br><br>
+
+            R²表示拟合优度，用于衡量模型对数据变化趋势的解释能力，越接近1表示模型拟合效果越好。
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

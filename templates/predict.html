@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>发电量预测</title>
+
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+</head>
+
+<body class="dashboard-body">
+
+<div class="top-bar">
+    <div>
+        <h1>发电量预测</h1>
+        <p>Photovoltaic Power Prediction</p>
+    </div>
+
+    <div class="top-status">
+        {% if model_exists %}
+            <span>预测模型正常</span>
+        {% else %}
+            <span>模型未训练</span>
+        {% endif %}
+        <a href="/">返回首页</a>
+    </div>
+</div>
+
+<div class="screen-container">
+
+    <div class="hero-card">
+        <h2>光伏发电功率预测</h2>
+        <p>
+            输入光照、散射辐照度、直射辐照度、温度等环境参数后，
+            系统会调用线性回归模型预测发电功率。
+            如果填写实际发电功率，系统会自动计算预测误差和误差率。
+        </p>
+    </div>
+
+    {% if error_message %}
+    <div class="panel" style="margin-bottom: 24px;">
+        <div class="panel-title">
+            <h3>预测错误提示</h3>
+            <span>Prediction Error</span>
+        </div>
+
+        <div style="
+            padding: 18px;
+            border-radius: 16px;
+            background: rgba(255, 77, 109, 0.15);
+            border: 1px solid rgba(255, 77, 109, 0.45);
+            color: #ffd6df;
+            line-height: 2;
+            font-size: 15px;
+        ">
+            {{ error_message }}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="main-grid">
+
+        <div class="panel">
+            <div class="panel-title">
+                <h3>预测参数输入</h3>
+                <span>Input Features</span>
+            </div>
+
+            <form method="post">
+
+                <div class="form-group">
+                    <label>总辐照度 light</label>
+                    <input type="number" step="0.01" name="light" placeholder="例如：850" required>
+                </div>
+
+                <div class="form-group">
+                    <label>散射辐照度 diffuse</label>
+                    <input type="number" step="0.01" name="diffuse" placeholder="例如：120" required>
+                </div>
+
+                <div class="form-group">
+                    <label>直射辐照度 direct</label>
+                    <input type="number" step="0.01" name="direct" placeholder="例如：700" required>
+                </div>
+
+                <div class="form-group">
+                    <label>环境温度 temperature</label>
+                    <input type="number" step="0.01" name="temperature" placeholder="例如：28" required>
+                </div>
+
+                <div class="form-group">
+                    <label>实际发电功率 actual_power（可选）</label>
+                    <input type="number" step="0.01" name="actual_power" placeholder="如果有实际值，可在这里填写">
+                </div>
+
+                <button class="login-btn" type="submit">
+                    开始预测
+                </button>
+
+            </form>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">
+                <h3>预测结果</h3>
+                <span>Prediction Result</span>
+            </div>
+
+            {% if next_power is not none %}
+
+            <div class="metric-card" style="margin-bottom: 20px;">
+                <span>预测发电功率</span>
+                <strong>{{ next_power }}</strong>
+                <em>kW</em>
+            </div>
+
+            {% if actual_power is not none %}
+            <div class="metric-card" style="margin-bottom: 20px;">
+                <span>实际发电功率</span>
+                <strong>{{ actual_power }}</strong>
+                <em>kW</em>
+            </div>
+
+            <div class="metric-card" style="margin-bottom: 20px;">
+                <span>绝对误差</span>
+                <strong>{{ error_value }}</strong>
+                <em>kW</em>
+            </div>
+
+            <div class="metric-card" style="margin-bottom: 20px;">
+                <span>误差率</span>
+                <strong>{{ error_rate }}%</strong>
+                <em>Error</em>
+            </div>
+            {% endif %}
+
+            {% else %}
+
+            <div style="line-height: 2; color: #bdeeff;">
+                请在左侧输入环境参数，然后点击“开始预测”查看预测结果。
+            </div>
+
+            {% endif %}
+        </div>
+
+    </div>
+
+    {% if next_power is not none and actual_power is not none %}
+    <div class="panel" style="margin-top: 24px;">
+
+        <div class="panel-title">
+            <h3>预测值与实际值对比图</h3>
+            <span>Prediction vs Actual</span>
+        </div>
+
+        <div id="compareChart" style="width: 100%; height: 420px;"></div>
+
+    </div>
+
+    <script>
+        var chart = echarts.init(document.getElementById("compareChart"));
+
+        var option = {
+            backgroundColor: 'transparent',
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['预测值', '实际值'],
+                textStyle: {
+                    color: '#b8eaff'
+                }
+            },
+            grid: {
+                left: '5%',
+                right: '5%',
+                bottom: '10%',
+                top: '15%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: ['本次预测'],
+                axisLine: {
+                    lineStyle: {
+                        color: '#6ee7ff'
+                    }
+                },
+                axisLabel: {
+                    color: '#b8eaff'
+                }
+            },
+            yAxis: {
+                type: 'value',
+                name: '发电功率(kW)',
+                nameTextStyle: {
+                    color: '#b8eaff'
+                },
+                axisLabel: {
+                    color: '#b8eaff'
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: 'rgba(110,231,255,0.15)'
+                    }
+                }
+            },
+            series: [
+                {
+                    name: '预测值',
+                    type: 'bar',
+                    data: [{{ next_power }}]
+                },
+                {
+                    name: '实际值',
+                    type: 'bar',
+                    data: [{{ actual_power }}]
+                }
+            ]
+        };
+
+        chart.setOption(option);
+
+        window.addEventListener("resize", function () {
+            chart.resize();
+        });
+    </script>
+    {% endif %}
+
+</div>
+
+</body>
+
+</html>
